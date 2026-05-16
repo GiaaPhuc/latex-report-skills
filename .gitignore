@@ -1,0 +1,28 @@
+## --- LaTeX Auxiliary Files ---
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+*.xml
+*.bcf
+*-blx.bib
+*.run.xml
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.pdfsync
+
+## --- Project Specific ---
+# Không nên track file PDF kết quả nếu chỉ là repo chứa skill/template
+*.pdf
+plan.md
+
+## --- OS/Editor Files ---
+.DS_Store
+Thumbs.db
+.vscode/
+.cursor/
