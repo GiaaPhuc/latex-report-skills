@@ -1,0 +1,426 @@
+%% academic-report-vi.tex
+%% Template báo cáo học thuật tiếng Việt đầy đủ
+%% Engine: XeLaTeX (BẮT BUỘC cho tiếng Việt)
+%% Compile: xelatex → biber → xelatex → xelatex
+%%
+%% Cách compile:
+%%   xelatex academic-report-vi.tex
+%%   biber academic-report-vi
+%%   xelatex academic-report-vi.tex
+%%   xelatex academic-report-vi.tex
+
+\documentclass[12pt, a4paper]{report}
+
+%% ================================================================
+%% PACKAGES
+%% ================================================================
+
+%% Encoding & Ngôn ngữ (XeLaTeX)
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setotherlanguage{english}
+\setmainfont{Times New Roman}
+% Thay bằng font mã nguồn mở nếu không có Times New Roman:
+% \setmainfont{FreeSerif}
+
+%% Layout
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=3cm, bottom=2.5cm,
+  left=3.5cm, right=2cm
+}
+
+%% Header & Footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\leftmark}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+%% Hình ảnh
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{figures/}}
+
+%% Bảng
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%% Math
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue,
+  pdftitle={Ứng dụng Học Sâu trong Phân Loại Văn Bản Tiếng Việt},
+  pdfauthor={Nguyễn Văn An}
+}
+
+%% Bibliography
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\addbibresource{sample.bib}
+
+%% Todo notes (xoá khi hoàn thiện)
+\usepackage[colorinlistoftodos]{todonotes}
+
+%% Spacing
+\usepackage{setspace}
+\onehalfspacing
+
+%% ================================================================
+%% BEGIN DOCUMENT
+%% ================================================================
+\begin{document}
+
+%% ================================================================
+%% 1. TITLE PAGE
+%% ================================================================
+\begin{titlepage}
+  \centering
+
+  {\Large\bfseries TRƯỜNG ĐẠI HỌC ABC\\[0.1cm]}
+  {\large KHOA CÔNG NGHỆ THÔNG TIN\\[0.3cm]}
+  \rule{\textwidth}{0.8pt}\\[1.5cm]
+
+  {\Huge\bfseries ỨNG DỤNG HỌC SÂU\\[0.4cm]}
+  {\Large\bfseries TRONG PHÂN LOẠI VĂN BẢN TIẾNG VIỆT\\[1cm]}
+
+  {\large Báo cáo môn học: Xử lý Ngôn ngữ Tự nhiên\\[0.3cm]}
+  {\large Mã học phần: IT4040\\[2cm]}
+
+  \begin{tabular}{ll}
+    \textbf{Sinh viên thực hiện:} & Nguyễn Văn An \\
+    \textbf{MSSV:}                & 20215678 \\[0.3cm]
+    \textbf{Giảng viên hướng dẫn:} & TS. Trần Thị Bình \\
+    \textbf{Bộ môn:}              & Khoa học Máy tính \\
+  \end{tabular}
+
+  \vfill
+  {\large Hà Nội, tháng 5 năm 2026}
+\end{titlepage}
+
+%% ================================================================
+%% 2. ABSTRACT (TIẾNG VIỆT)
+%% ================================================================
+\chapter*{Tóm tắt}
+\addcontentsline{toc}{chapter}{Tóm tắt}
+
+Báo cáo này trình bày nghiên cứu về việc ứng dụng các kỹ thuật học sâu
+(\textit{deep learning}) trong bài toán phân loại văn bản tiếng Việt.
+Chúng tôi đề xuất một mô hình dựa trên kiến trúc Transformer được tinh chỉnh
+(\textit{fine-tuned}) trên tập dữ liệu tiếng Việt gồm 50.000 mẫu văn bản
+thuộc 10 chủ đề khác nhau.
+
+Kết quả thực nghiệm cho thấy mô hình đề xuất đạt độ chính xác 92{,}7\%
+trên tập kiểm tra, vượt trội hơn so với các phương pháp baseline truyền thống
+như SVM (78{,}3\%) và LSTM (85{,}2\%). Đặc biệt, mô hình thể hiện hiệu suất
+tốt với các văn bản có độ dài ngắn, điều mà các phương pháp trước đây
+còn hạn chế \cite{Nguyen2024deep}.
+
+\medskip
+\noindent\textbf{Từ khóa:} học sâu, phân loại văn bản, tiếng Việt,
+Transformer, xử lý ngôn ngữ tự nhiên.
+
+%% Abstract tiếng Anh (tuỳ chọn)
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This report presents a study on applying deep learning techniques to Vietnamese
+text classification. We propose a fine-tuned Transformer-based model trained on
+a dataset of 50,000 Vietnamese text samples across 10 categories.
+
+Experimental results demonstrate that our model achieves 92.7\% accuracy on the
+test set, outperforming traditional baseline methods such as SVM (78.3\%) and
+LSTM (85.2\%).
+
+\medskip
+\noindent\textbf{Keywords:} deep learning, text classification, Vietnamese,
+Transformer, natural language processing.
+
+%% ================================================================
+%% 3. TABLE OF CONTENTS
+%% ================================================================
+\tableofcontents
+\newpage
+
+%% ================================================================
+%% 4-5. LIST OF FIGURES & TABLES
+%% ================================================================
+\listoffigures
+\addcontentsline{toc}{chapter}{Danh mục hình ảnh}
+
+\listoftables
+\addcontentsline{toc}{chapter}{Danh mục bảng biểu}
+\newpage
+
+%% ================================================================
+%% 7. MAIN BODY
+%% ================================================================
+
+%% -------- CHƯƠNG 1: GIỚI THIỆU --------
+\chapter{Giới thiệu}
+
+\section{Đặt vấn đề}
+
+Phân loại văn bản là một trong những bài toán nền tảng của xử lý ngôn ngữ
+tự nhiên (NLP), với ứng dụng rộng rãi trong phân loại email spam, phân tích
+cảm xúc, và tổ chức nội dung trực tuyến \cite{Goodfellow2016}.
+
+Tuy nhiên, với tiếng Việt --- một ngôn ngữ đơn lập có hệ thống thanh điệu
+phức tạp --- việc phân loại văn bản vẫn còn nhiều thách thức chưa được
+giải quyết triệt để \cite{Le2024bert}. Các mô hình được huấn luyện cho
+tiếng Anh thường không đạt hiệu suất tốt khi áp dụng trực tiếp cho tiếng Việt.
+
+\section{Mục tiêu nghiên cứu}
+
+Báo cáo này hướng đến ba mục tiêu chính:
+
+\begin{enumerate}
+  \item Xây dựng pipeline phân loại văn bản tiếng Việt sử dụng mô hình Transformer
+  \item Đánh giá hiệu suất trên tập dữ liệu chuẩn
+  \item So sánh với các phương pháp baseline (SVM, LSTM, CNN)
+\end{enumerate}
+
+\section{Phạm vi nghiên cứu}
+
+Nghiên cứu tập trung vào:
+\begin{itemize}
+  \item Văn bản tin tức tiếng Việt (không xét văn bản mạng xã hội)
+  \item 10 chủ đề: chính trị, kinh tế, thể thao, giải trí, công nghệ,
+        sức khỏe, giáo dục, pháp luật, khoa học, môi trường
+  \item Độ dài văn bản từ 50 đến 500 từ
+\end{itemize}
+
+\section{Cấu trúc báo cáo}
+
+Phần còn lại của báo cáo được tổ chức như sau:
+Chương~\ref{chap:theory} trình bày cơ sở lý thuyết.
+Chương~\ref{chap:method} mô tả phương pháp đề xuất.
+Chương~\ref{chap:results} trình bày và phân tích kết quả thực nghiệm.
+Chương~\ref{chap:conclusion} kết luận và đề xuất hướng nghiên cứu tiếp theo.
+
+%% -------- CHƯƠNG 2: CƠ SỞ LÝ THUYẾT --------
+\chapter{Cơ sở lý thuyết}
+\label{chap:theory}
+
+\section{Học sâu và mạng nơ-ron}
+
+Học sâu là một nhánh của học máy (\textit{machine learning}) sử dụng mạng
+nơ-ron nhân tạo nhiều lớp để học các biểu diễn đặc trưng từ dữ liệu thô
+\cite{LeCun2015deep}. Hàm kích hoạt ReLU được định nghĩa:
+
+\begin{equation}
+  \label{eq:relu}
+  f(x) = \max(0, x)
+\end{equation}
+
+\section{Kiến trúc Transformer}
+
+Transformer \cite{Vaswani2017attention} là kiến trúc mạng nơ-ron dựa trên
+cơ chế self-attention, cho phép mô hình học được mối quan hệ giữa các từ
+trong câu bất kể khoảng cách.
+
+Cơ chế attention được tính như sau:
+
+\begin{equation}
+  \label{eq:attention}
+  \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right) V
+\end{equation}
+
+trong đó $Q$, $K$, $V$ lần lượt là ma trận query, key và value;
+$d_k$ là chiều của vector key.
+
+\section{Các phương pháp baseline}
+
+\begin{table}[htbp]
+  \centering
+  \caption{So sánh các phương pháp phân loại văn bản}
+  \label{tab:methods}
+  \begin{tabular}{lll}
+    \toprule
+    Phương pháp & Đặc điểm & Hạn chế \\
+    \midrule
+    SVM         & Hiệu quả với feature thủ công & Không học tự động \\
+    LSTM        & Xử lý chuỗi tuần tự & Chậm, khó song song hóa \\
+    CNN         & Nhanh, hiệu quả với n-gram & Bỏ qua thứ tự xa \\
+    Transformer & Self-attention toàn cục & Tốn bộ nhớ $O(n^2)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%% -------- CHƯƠNG 3: PHƯƠNG PHÁP --------
+\chapter{Phương pháp nghiên cứu}
+\label{chap:method}
+
+\section{Tập dữ liệu}
+
+Chúng tôi sử dụng tập dữ liệu VNews-50K gồm 50.000 bài báo tiếng Việt
+thu thập từ các tờ báo điện tử lớn trong giai đoạn 2020--2024. Tập dữ liệu
+được chia theo tỷ lệ 70/15/15 cho train/validation/test.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Thống kê tập dữ liệu VNews-50K}
+  \label{tab:dataset}
+  \begin{tabularx}{\textwidth}{Xrrr}
+    \toprule
+    Chủ đề & Train & Validation & Test \\
+    \midrule
+    Chính trị  & 3.500 & 750 & 750 \\
+    Kinh tế    & 3.500 & 750 & 750 \\
+    Thể thao   & 3.500 & 750 & 750 \\
+    Giải trí   & 3.500 & 750 & 750 \\
+    Công nghệ  & 3.500 & 750 & 750 \\
+    \midrule
+    Tổng       & 35.000 & 7.500 & 7.500 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{Mô hình đề xuất}
+
+Chúng tôi fine-tune mô hình PhoBERT \cite{Le2024bert} trên tập dữ liệu
+VNews-50K. Quá trình huấn luyện sử dụng các siêu tham số sau:
+
+\begin{itemize}
+  \item Learning rate: $2 \times 10^{-5}$
+  \item Batch size: 32
+  \item Số epoch: 10
+  \item Optimizer: AdamW với weight decay $0.01$
+\end{itemize}
+
+%% Ví dụ thêm hình ảnh (bỏ comment khi có file ảnh)
+%\begin{figure}[htbp]
+%  \centering
+%  \includegraphics[width=0.85\textwidth]{architecture.png}
+%  \caption{Kiến trúc mô hình đề xuất}
+%  \label{fig:architecture}
+%\end{figure}
+
+%% -------- CHƯƠNG 4: KẾT QUẢ --------
+\chapter{Kết quả và thảo luận}
+\label{chap:results}
+
+\section{Kết quả thực nghiệm}
+
+Bảng~\ref{tab:results} so sánh hiệu suất của các mô hình trên tập test.
+Mô hình đề xuất đạt kết quả tốt nhất trên tất cả các chỉ số.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Kết quả so sánh hiệu suất các mô hình (tập test)}
+  \label{tab:results}
+  \begin{tabular}{lcccc}
+    \toprule
+    Mô hình      & Accuracy & Precision & Recall & F1-score \\
+    \midrule
+    SVM          & 78.3\%   & 0.781     & 0.783  & 0.779 \\
+    CNN          & 83.1\%   & 0.829     & 0.831  & 0.828 \\
+    LSTM         & 85.2\%   & 0.851     & 0.852  & 0.849 \\
+    \textbf{Đề xuất (PhoBERT)} & \textbf{92.7\%} & \textbf{0.926} & \textbf{0.927} & \textbf{0.923} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Phân tích và thảo luận}
+
+Kết quả cho thấy mô hình Transformer vượt trội đáng kể so với các phương
+pháp truyền thống. Cải thiện lớn nhất được quan sát ở chủ đề ``Công nghệ''
+(+9.2\% so với LSTM), nơi văn bản thường chứa nhiều thuật ngữ chuyên biệt.
+
+Tuy nhiên, mô hình vẫn còn hạn chế với các văn bản rất ngắn (dưới 50 từ),
+khi F1-score giảm xuống còn 85.4\%. \todo{Phân tích thêm trường hợp lỗi}
+
+%% -------- CHƯƠNG 5: KẾT LUẬN --------
+\chapter{Kết luận}
+\label{chap:conclusion}
+
+\section{Tóm tắt đóng góp}
+
+Báo cáo này đã:
+\begin{enumerate}
+  \item Xây dựng thành công pipeline phân loại văn bản tiếng Việt
+        dựa trên mô hình PhoBERT
+  \item Đạt độ chính xác 92{,}7\% trên tập kiểm tra, vượt trội hơn
+        các baseline tới 7{,}5 điểm phần trăm
+  \item Phân tích điểm mạnh và hạn chế của mô hình đề xuất
+\end{enumerate}
+
+\section{Hướng nghiên cứu tiếp theo}
+
+Trong tương lai, chúng tôi dự kiến:
+\begin{itemize}
+  \item Mở rộng tập dữ liệu lên 200.000 mẫu, bao gồm văn bản mạng xã hội
+  \item Thử nghiệm với các mô hình ngôn ngữ lớn mới hơn
+  \item Xây dựng ứng dụng web để phân loại văn bản thời gian thực
+\end{itemize}
+
+%% ================================================================
+%% 8. BIBLIOGRAPHY
+%% ================================================================
+\printbibliography[title={Tài liệu tham khảo}]
+
+%% ================================================================
+%% 9. APPENDICES
+%% ================================================================
+\appendix
+
+\chapter{Mã nguồn huấn luyện mô hình}
+\label{app:code}
+
+Đoạn code Python dưới đây minh họa quá trình fine-tune PhoBERT:
+
+\begin{verbatim}
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+model_name = "vinai/phobert-base"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(
+    model_name, num_labels=10
+)
+
+# Fine-tuning loop
+optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+for epoch in range(10):
+    for batch in train_dataloader:
+        outputs = model(**batch)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+\end{verbatim}
+
+\chapter{Danh sách tập dữ liệu}
+\label{app:dataset}
+
+Chi tiết nguồn dữ liệu được trình bày trong Bảng~\ref{tab:data-sources}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Nguồn dữ liệu VNews-50K}
+  \label{tab:data-sources}
+  \begin{tabular}{lrl}
+    \toprule
+    Nguồn & Số bài & URL \\
+    \midrule
+    VnExpress  & 20.000 & \url{https://vnexpress.net} \\
+    Tuổi Trẻ   & 15.000 & \url{https://tuoitre.vn} \\
+    Thanh Niên & 15.000 & \url{https://thanhnien.vn} \\
+    \midrule
+    Tổng       & 50.000 & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\end{document}

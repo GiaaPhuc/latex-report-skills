@@ -1,0 +1,256 @@
+%% ieee-paper.tex
+%% Template IEEE conference paper
+%% Engine: pdflatex hoặc xelatex
+%% Class: IEEEtran (download từ https://www.ieee.org/conferences/publishing/templates.html)
+%%
+%% Cách compile (tiếng Anh, pdflatex):
+%%   pdflatex ieee-paper.tex
+%%   biber ieee-paper
+%%   pdflatex ieee-paper.tex
+%%   pdflatex ieee-paper.tex
+
+\documentclass[conference]{IEEEtran}
+
+%% IEEEtran đã có sẵn nhiều cấu hình — không cần geometry
+
+%% ================================================================
+%% PACKAGES
+%% ================================================================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+
+%% Math
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%% Cite với IEEEtran thường dùng biblatex ieee style
+\usepackage[backend=biber, style=ieee, doi=true]{biblatex}
+\addbibresource{sample.bib}
+
+%% Hyperlinks (để ở cuối package list)
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=false,    % IEEE thường không dùng colored links
+  hidelinks=true
+}
+
+%% ================================================================
+%% TITLE, AUTHORS, AFFILIATIONS
+%% ================================================================
+\title{Deep Learning for Vietnamese Text Classification:\\
+       A Transformer-Based Approach}
+
+\author{
+  \IEEEauthorblockN{Van An Nguyen\IEEEauthorrefmark{1},
+                    Thi Binh Tran\IEEEauthorrefmark{2}}
+  \IEEEauthorblockA{\IEEEauthorrefmark{1}%
+    School of Information and Communication Technology\\
+    Hanoi University of Science and Technology\\
+    Hanoi, Vietnam\\
+    Email: an.nguyen@hust.edu.vn}
+  \IEEEauthorblockA{\IEEEauthorrefmark{2}%
+    Faculty of Computer Science\\
+    Vietnam National University\\
+    Hanoi, Vietnam\\
+    Email: binh.tran@vnu.edu.vn}
+}
+
+%% ================================================================
+%% BEGIN DOCUMENT
+%% ================================================================
+\begin{document}
+
+\maketitle
+
+%% ================================================================
+%% ABSTRACT
+%% ================================================================
+\begin{abstract}
+This paper presents a Transformer-based approach for Vietnamese text
+classification. We fine-tune PhoBERT on a dataset of 50,000 Vietnamese
+news articles spanning 10 categories. Our model achieves 92.7\% accuracy
+on the test set, outperforming SVM (78.3\%) and LSTM (85.2\%) baselines
+by a significant margin. Experiments demonstrate that pre-trained language
+models substantially improve classification performance for low-resource
+Vietnamese text.
+\end{abstract}
+
+%% ================================================================
+%% KEYWORDS (IEEE format)
+%% ================================================================
+\begin{IEEEkeywords}
+deep learning, text classification, Vietnamese NLP, Transformer,
+BERT, fine-tuning
+\end{IEEEkeywords}
+
+%% ================================================================
+%% MAIN BODY — IEEE uses 2-column layout
+%% ================================================================
+
+%% -------- I. INTRODUCTION --------
+\section{Introduction}
+
+Text classification is a fundamental task in natural language processing
+(NLP) with applications ranging from spam detection to sentiment analysis
+\cite{Goodfellow2016}. While significant progress has been achieved for
+English, Vietnamese text classification remains challenging due to the
+language's tonal nature and limited labeled resources \cite{Le2024bert}.
+
+Recent advances in pre-trained language models, particularly BERT
+\cite{Vaswani2017attention}, have shown remarkable performance across
+various NLP tasks. However, direct application of English-trained models
+to Vietnamese yields suboptimal results.
+
+In this paper, we make the following contributions:
+\begin{itemize}
+  \item A fine-tuned PhoBERT model for Vietnamese text classification
+  \item Comprehensive evaluation on VNews-50K, a new benchmark dataset
+  \item Analysis of model behavior across text length and topic categories
+\end{itemize}
+
+%% -------- II. RELATED WORK --------
+\section{Related Work}
+
+\subsection{Text Classification Methods}
+
+Traditional approaches to text classification rely on hand-crafted features
+combined with classifiers such as Support Vector Machines (SVM) or Naive
+Bayes \cite{Goodfellow2016}. While effective for well-defined feature spaces,
+these methods require significant domain expertise.
+
+Neural network-based approaches, including Convolutional Neural Networks
+(CNN) and Long Short-Term Memory (LSTM) networks, learn representations
+automatically from data \cite{LeCun2015deep}. However, they are trained
+from scratch and lack transfer learning capabilities.
+
+\subsection{Pre-trained Language Models}
+
+The Transformer architecture \cite{Vaswani2017attention} revolutionized
+NLP by enabling efficient attention over entire sequences. BERT and its
+variants leverage large-scale pre-training on unlabeled text, enabling
+effective transfer learning with minimal task-specific data.
+
+For Vietnamese, PhoBERT \cite{Le2024bert} provides a domain-appropriate
+pre-trained model trained on 20GB of Vietnamese text, demonstrating
+strong performance on multiple downstream tasks.
+
+%% -------- III. METHODOLOGY --------
+\section{Methodology}
+
+\subsection{Dataset}
+
+We construct VNews-50K, a balanced dataset of 50,000 Vietnamese news
+articles from three major outlets: VnExpress, Tuổi Trẻ, and Thanh Niên.
+Articles are categorized into 10 topics with 5,000 samples each.
+The dataset is split 70/15/15 for train/validation/test.
+
+\subsection{Model Architecture}
+
+Our approach fine-tunes PhoBERT-base \cite{Le2024bert} for sequence
+classification. A linear classification head is added on top of the
+\texttt{[CLS]} token representation:
+
+\begin{equation}
+  \label{eq:classifier}
+  \hat{y} = \text{softmax}(\mathbf{W} \cdot h_{\text{CLS}} + \mathbf{b})
+\end{equation}
+
+where $h_{\text{CLS}} \in \mathbb{R}^{768}$ is the contextualized
+representation of the \texttt{[CLS]} token, $\mathbf{W} \in \mathbb{R}^{10 \times 768}$,
+and $\mathbf{b} \in \mathbb{R}^{10}$.
+
+\subsection{Training Details}
+
+The model is trained with the following hyperparameters:
+\begin{itemize}
+  \item Optimizer: AdamW \cite{Pytorch2024} with learning rate $2 \times 10^{-5}$
+  \item Batch size: 32, max sequence length: 256 tokens
+  \item Epochs: 10 with early stopping (patience = 3)
+  \item Hardware: NVIDIA A100 40GB GPU
+\end{itemize}
+
+%% -------- IV. EXPERIMENTS --------
+\section{Experiments and Results}
+
+\subsection{Baselines}
+
+We compare against four baselines:
+(1) TF-IDF + SVM, (2) Word2Vec + CNN, (3) Word2Vec + BiLSTM,
+and (4) mBERT (multilingual BERT).
+
+\subsection{Main Results}
+
+Table~\ref{tab:main_results} presents the classification results on
+the test set. Our PhoBERT-based model achieves the best performance
+across all metrics.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Performance Comparison on VNews-50K Test Set}
+  \label{tab:main_results}
+  \begin{tabular}{lcccc}
+    \toprule
+    Model      & Acc.   & Prec. & Rec.  & F1    \\
+    \midrule
+    TF-IDF+SVM & 78.3\% & 0.781 & 0.783 & 0.779 \\
+    CNN        & 83.1\% & 0.829 & 0.831 & 0.828 \\
+    BiLSTM     & 85.2\% & 0.851 & 0.852 & 0.849 \\
+    mBERT      & 88.9\% & 0.887 & 0.889 & 0.886 \\
+    \textbf{PhoBERT (Ours)} & \textbf{92.7\%} & \textbf{0.926} & \textbf{0.927} & \textbf{0.923} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+\textbf{Effect of text length.} Our model maintains robust performance
+for medium-length texts (100--300 tokens) but degrades for very short
+texts ($<$50 tokens), achieving 85.4\% F1 in that range.
+
+\textbf{Per-category performance.} The model performs best on
+``Technology'' (F1 = 0.961) due to distinctive vocabulary, and
+worst on ``Politics'' (F1 = 0.889) due to lexical overlap with
+``Economics'' and ``Law''.
+
+Fig.~\ref{fig:confusion} shows the confusion matrix, highlighting
+the primary source of errors between related categories.
+
+\begin{figure}[htbp]
+  \centering
+  %% Uncomment when figure file is available:
+  %% \includegraphics[width=\columnwidth]{confusion_matrix.png}
+  \fbox{\parbox{0.85\columnwidth}{\centering [Confusion Matrix Figure]\\
+  \small Replace with actual \texttt{confusion\_matrix.png}}}
+  \caption{Confusion matrix on VNews-50K test set (10 categories).
+           Darker cells indicate higher confusion between categories.}
+  \label{fig:confusion}
+\end{figure}
+
+%% -------- V. CONCLUSION --------
+\section{Conclusion}
+
+We presented a Transformer-based approach for Vietnamese text classification
+that achieves state-of-the-art performance on VNews-50K. Fine-tuning
+PhoBERT yields a 7.5-point improvement in accuracy over BiLSTM baseline.
+Future work will explore data augmentation for short texts and
+zero-shot generalization to new categories.
+
+%% ================================================================
+%% ACKNOWLEDGMENT (IEEE convention)
+%% ================================================================
+\section*{Acknowledgment}
+
+The authors thank the reviewers for their insightful comments.
+This work was supported by Vietnam National Foundation for Science
+and Technology Development (NAFOSTED) under grant no.\ 102.01-2024.xx.
+
+%% ================================================================
+%% BIBLIOGRAPHY
+%% ================================================================
+\printbibliography
+
+\end{document}

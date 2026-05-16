@@ -1,0 +1,265 @@
+%% thesis-chapter.tex
+%% Template một chapter điển hình của luận văn thạc sĩ / tiến sĩ
+%% Engine: XeLaTeX (cho tiếng Việt)
+%%
+%% File này thường được \include vào file main.tex chính:
+%%   \include{chapters/chapter2-theory}
+%%
+%% Để compile standalone, bật \documentclass bên dưới.
+%% Khi dùng cùng main.tex, xoá phần documentclass và begin/end document.
+
+\documentclass[12pt, a4paper]{report}
+
+%% ================================================================
+%% PACKAGES (chỉ cần khi compile standalone)
+%% ================================================================
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setmainfont{Times New Roman}
+
+\usepackage{geometry}
+\geometry{a4paper, top=3cm, bottom=2.5cm, left=3.5cm, right=2cm}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\addbibresource{sample.bib}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{setspace}
+\onehalfspacing
+
+%% Đánh số từ 1 cho standalone
+\setcounter{chapter}{1}
+
+\begin{document}
+
+%% ================================================================
+%% CHƯƠNG 2: CƠ SỞ LÝ THUYẾT
+%% (Trong luận văn thực, đây là \include{chapters/chapter2})
+%% ================================================================
+
+\chapter{Cơ sở lý thuyết}
+\label{chap:theory}
+
+Chương này trình bày nền tảng lý thuyết liên quan đến bài toán phân loại
+văn bản tiếng Việt, bao gồm các khái niệm về học máy, mạng nơ-ron sâu,
+và các mô hình ngôn ngữ hiện đại.
+
+%% ================================================================
+\section{Học máy và Học sâu}
+\label{sec:ml-dl}
+%% ================================================================
+
+\subsection{Học máy}
+
+Học máy (\textit{Machine Learning --- ML}) là lĩnh vực nghiên cứu cách
+máy tính tự học từ dữ liệu mà không cần lập trình tường minh từng quy tắc
+\cite{Goodfellow2016}. Một bài toán học máy được định nghĩa bởi ba thành phần:
+
+\begin{itemize}
+  \item \textbf{Task} $T$: Bài toán cần giải quyết (phân loại, hồi quy, sinh ảnh...)
+  \item \textbf{Experience} $E$: Dữ liệu huấn luyện
+  \item \textbf{Performance measure} $P$: Chỉ số đánh giá hiệu suất
+\end{itemize}
+
+\subsection{Học sâu}
+
+Học sâu (\textit{Deep Learning --- DL}) là một nhánh của học máy sử dụng
+mạng nơ-ron nhân tạo nhiều lớp (\textit{deep neural networks}) để học
+các biểu diễn phân cấp từ dữ liệu thô \cite{LeCun2015deep}.
+
+\begin{equation}
+  \label{eq:forward}
+  h^{(l)} = \sigma\!\left(W^{(l)} h^{(l-1)} + b^{(l)}\right)
+\end{equation}
+
+trong đó $h^{(l)}$ là activation của lớp $l$, $W^{(l)}$ và $b^{(l)}$
+là trọng số và bias tương ứng, $\sigma(\cdot)$ là hàm kích hoạt phi tuyến.
+
+Hàm mất mát cross-entropy thường dùng cho bài toán phân loại nhiều lớp:
+
+\begin{equation}
+  \label{eq:crossentropy}
+  \mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\sum_{c=1}^{C}
+  y_{ic} \log \hat{y}_{ic}
+\end{equation}
+
+trong đó $N$ là số mẫu, $C$ là số lớp, $y_{ic} \in \{0,1\}$ là nhãn thực,
+và $\hat{y}_{ic} \in [0,1]$ là xác suất dự đoán.
+
+%% ================================================================
+\section{Kiến trúc Transformer}
+\label{sec:transformer}
+%% ================================================================
+
+\subsection{Tổng quan}
+
+Transformer \cite{Vaswani2017attention} là kiến trúc mạng nơ-ron
+dựa hoàn toàn trên cơ chế attention, loại bỏ hoàn toàn thành phần
+hồi quy (RNN) và tích chập (CNN). Điều này cho phép song song hóa
+hoàn toàn trong quá trình huấn luyện.
+
+\subsection{Scaled Dot-Product Attention}
+
+Cơ chế attention cơ bản được tính như Phương trình~\eqref{eq:attention}:
+
+\begin{equation}
+  \label{eq:attention}
+  \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\end{equation}
+
+trong đó:
+\begin{itemize}
+  \item $Q \in \mathbb{R}^{n \times d_k}$: Ma trận query
+  \item $K \in \mathbb{R}^{m \times d_k}$: Ma trận key
+  \item $V \in \mathbb{R}^{m \times d_v}$: Ma trận value
+  \item $\sqrt{d_k}$: Hệ số scale để ổn định gradient
+\end{itemize}
+
+\subsection{Multi-Head Attention}
+
+Multi-head attention cho phép mô hình chú ý đến thông tin từ nhiều
+không gian biểu diễn khác nhau đồng thời:
+
+\begin{align}
+  \text{MultiHead}(Q,K,V) &= \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\,W^O \\
+  \text{where head}_i     &= \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)
+\end{align}
+
+Hình~\ref{fig:transformer} minh họa kiến trúc Transformer encoder.
+
+\begin{figure}[htbp]
+  \centering
+  %% Thay bằng file ảnh thực tế khi có
+  \fbox{\parbox{0.7\textwidth}{\centering\vspace{1cm}
+    [Hình minh họa kiến trúc Transformer]\\[0.3cm]
+    \small Thay thế bằng \texttt{figures/transformer.png}
+    \vspace{1cm}}}
+  \caption{Kiến trúc Transformer encoder với multi-head self-attention
+           và feed-forward network~\cite{Vaswani2017attention}.}
+  \label{fig:transformer}
+\end{figure}
+
+%% ================================================================
+\section{Các mô hình ngôn ngữ tiền huấn luyện}
+\label{sec:plm}
+%% ================================================================
+
+\subsection{BERT}
+
+BERT (\textit{Bidirectional Encoder Representations from Transformers})
+\cite{Vaswani2017attention} là mô hình ngôn ngữ được tiền huấn luyện
+trên hai nhiệm vụ tự giám sát:
+
+\begin{enumerate}
+  \item \textbf{Masked Language Modeling (MLM):} Dự đoán 15\% token
+        bị che ngẫu nhiên trong câu
+  \item \textbf{Next Sentence Prediction (NSP):} Dự đoán xem hai câu
+        có liên tiếp nhau không
+\end{enumerate}
+
+\subsection{PhoBERT}
+
+PhoBERT \cite{Le2024bert} là mô hình BERT được tiền huấn luyện đặc biệt
+cho tiếng Việt, với các đặc điểm nổi bật:
+
+\begin{table}[htbp]
+  \centering
+  \caption{Thông số kỹ thuật của PhoBERT-base và PhoBERT-large}
+  \label{tab:phobert}
+  \begin{tabular}{lcc}
+    \toprule
+    Tham số & PhoBERT-base & PhoBERT-large \\
+    \midrule
+    Số lớp Transformer        & 12     & 24 \\
+    Kích thước hidden          & 768    & 1024 \\
+    Số attention heads         & 12     & 16 \\
+    Số tham số                 & 135M   & 370M \\
+    Dữ liệu tiền huấn luyện    & 20GB   & 20GB \\
+    Từ vựng                    & 64.000 & 64.000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Bảng~\ref{tab:phobert} cho thấy PhoBERT-large có dung lượng lớn hơn
+gần 3 lần so với PhoBERT-base, tuy nhiên điều này không đảm bảo kết quả
+tốt hơn trên mọi bài toán --- đặc biệt khi dữ liệu fine-tuning nhỏ.
+\todo{Bổ sung kết quả so sánh PhoBERT-base vs large trên VNews-50K}
+
+%% ================================================================
+\section{Đánh giá mô hình}
+\label{sec:evaluation}
+%% ================================================================
+
+\subsection{Các chỉ số đánh giá}
+
+Trong bài toán phân loại đa lớp, chúng tôi sử dụng các chỉ số sau:
+
+\begin{description}
+  \item[Accuracy] Tỷ lệ mẫu được phân loại đúng trên tổng số mẫu:
+        $\text{Acc} = \frac{\text{TP} + \text{TN}}{N}$
+
+  \item[Precision] Trong các mẫu được dự đoán là lớp $c$, bao nhiêu
+        phần trăm thực sự thuộc lớp $c$:
+        $P = \frac{\text{TP}}{\text{TP} + \text{FP}}$
+
+  \item[Recall] Trong các mẫu thực sự thuộc lớp $c$, bao nhiêu phần
+        trăm được nhận diện đúng:
+        $R = \frac{\text{TP}}{\text{TP} + \text{FN}}$
+
+  \item[F1-score] Trung bình điều hòa của Precision và Recall:
+        \begin{equation}
+          \label{eq:f1}
+          F_1 = 2 \cdot \frac{P \cdot R}{P + R}
+        \end{equation}
+\end{description}
+
+Với bài toán đa lớp, chúng tôi sử dụng \textbf{macro-averaged F1},
+tính trung bình F1 của từng lớp mà không trọng số theo số lượng mẫu:
+
+\begin{equation}
+  \label{eq:macro-f1}
+  F_1^{\text{macro}} = \frac{1}{C} \sum_{c=1}^{C} F_{1,c}
+\end{equation}
+
+\subsection{Kiểm định thống kê}
+
+Để đảm bảo kết quả so sánh có ý nghĩa thống kê, chúng tôi sử dụng
+phép kiểm định McNemar \cite{Goodfellow2016} với ngưỡng $p < 0.05$.
+Các thực nghiệm được lặp lại 5 lần với các random seed khác nhau,
+kết quả báo cáo là mean $\pm$ std.
+
+%% ================================================================
+\section{Tóm tắt chương}
+\label{sec:summary}
+%% ================================================================
+
+Chương này đã trình bày các nền tảng lý thuyết quan trọng:
+
+\begin{enumerate}
+  \item Học máy và học sâu với các kiến trúc mạng nơ-ron cơ bản
+        (Phần~\ref{sec:ml-dl})
+  \item Kiến trúc Transformer và cơ chế self-attention
+        (Phần~\ref{sec:transformer})
+  \item Các mô hình ngôn ngữ tiền huấn luyện, đặc biệt là PhoBERT
+        phù hợp với tiếng Việt (Phần~\ref{sec:plm})
+  \item Các chỉ số đánh giá cho bài toán phân loại đa lớp
+        (Phần~\ref{sec:evaluation})
+\end{enumerate}
+
+Chương~\ref{chap:method} tiếp theo sẽ trình bày phương pháp đề xuất
+dựa trên các nền tảng lý thuyết này.
+
+%% ================================================================
+%% BIBLIOGRAPHY (chỉ cần khi compile standalone)
+%% ================================================================
+\printbibliography[title={Tài liệu tham khảo}]
+
+\end{document}
