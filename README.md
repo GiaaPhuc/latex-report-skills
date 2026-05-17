@@ -33,19 +33,19 @@ Tạo báo cáo học thuật/kỹ thuật chuẩn LaTeX.
 Cài tất cả skills:
 
 ```bash
-npx skills add {github-username}/latex-report-skills
+npx skills add GiaaPhuc/latex-report-skills
 ```
 
 Cài skill cụ thể:
 
 ```bash
-npx skills add {github-username}/latex-report-skills --skill latex-report
+npx skills add GiaaPhuc/latex-report-skills --skill latex-report
 ```
 
 Xem danh sách skills có sẵn:
 
 ```bash
-npx skills add {github-username}/latex-report-skills --list
+npx skills add GiaaPhuc/latex-report-skills --list
 ```
 
 Xem danh sách skills đã cài:
